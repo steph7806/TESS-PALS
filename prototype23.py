@@ -1,54 +1,37 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-#this downloads the csv file from exofop
 import urllib.request
 import csv
 import os 
+import sys
+import pandas as pd
 
-print('Beginning file download with urllib2...')
+#this makes sure that I'm in the right directory
+os.chdir('/Users/stephaniegomez/Documents/EXOFOPCSV/')
 
+#this downloads the csv file from EXOFOP 
+print('Downloading EXOFOP Table CSV as "comparison.csv"...')
 url = 'https://exofop.ipac.caltech.edu/tess/download_toi.php?sort=toi&output=csv'
-urllib.request.urlretrieve(url, '/Users/stephaniegomez/Downloads/comparison.csv')
+urllib.request.urlretrieve(url, '/Users/stephaniegomez/Documents/EXOFOPCSV/comparison.csv')
 
-#this compares the values of the dowloaded table along with a "master"file
-#if it finds a change, it replaces the old masterfile with the most recent itteration
-input_file1 = "/Users/stephaniegomez/Downloads/masterlist.csv"
-input_file2 = "/Users/stephaniegomez/Downloads/comparison.csv"
-            
-            
-with open('masterlist.csv', 'r') as t1, open('comparison.csv', 'r') as t2:
-    fileone = t1.readlines()
-    filetwo = t2.readlines()
+#this reads the csv files and compares for duplicates 
+a = pd.read_csv('mainlist.csv')
+b = pd.read_csv('comparison.csv')
 
-with open('update.csv', 'w') as outFile:
-    for line in filetwo:
-        if line not in fileone:
-            outFile.write(line)
-            print("There has been an update!")
-            os.remove("masterlist.csv")
-            os.rename(r'/Users/stephaniegomez/Downloads/comparison.csv',r'/Users/stephaniegomez/Downloads/masterlist.csv')
-        else:
-            print("No Updates")
-            os.remove("comparison.csv")
+#this merges the files to check for duplicates
+result = pd.concat([a,b], axis=0)
+result.drop_duplicates(keep=False)
 
+#this creates a file 
+result.to_csv('result.csv', index=False)
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
+#this checks if the file is empty, thus signaling if there has been an update
+if os.path.getsize('/Users/stephaniegomez/Documents/EXOFOPCSV/result.csv') > 0:
+    print("There has been an update!")
+    os.remove("mainlist.csv")
+    os.rename(r'/Users/stephaniegomez/Documents/EXOFOPCSV/comparison.csv',r'/Users/stephaniegomez/Documents/EXOFOPCSV/mainlist.csv')
+else:
+        print("There are no updates.")
+        os.remove('comparison.csv')
+        os.remove('result.csv')
 
 
 
