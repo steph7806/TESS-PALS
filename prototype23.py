@@ -57,8 +57,8 @@ if (np.all(frame == frame)):
         result.to_csv(r'/Users/stephaniegomez/Documents/EXOFOPCSV/result.csv',index = False, header=True)
         
         #this sets up the email and sends it
-        email = 'stephaniegm7806@gmail.com'
-        password = 'password'
+        email = ${{ secrets.EMAIL_USER }}
+        password = ${{ secrets.EMAIL_PASSWORD }}
         send_to_email = 'steph_7806@berkeley.edu'
         subject = 'TESS Updated'
         message = 'This email has attached the new updates within TESS. Have fun!'
